@@ -45,23 +45,24 @@ export function FormEmbarcacao({
   return (
     <FormAcao acao={acao} className="form">
       {e && <input type="hidden" name="id" value={e.id} />}
+      <p className="aviso-obrigatorios"><span aria-hidden="true">*</span> Campos obrigatórios</p>
       <fieldset>
         <legend className="eyebrow">Identificação</legend>
         <div className="campos">
           <div className="campo">
-            <label htmlFor="condicao">Condição *</label>
-            <select id="condicao" name="condicao" value={condicao} onChange={(ev) => setCondicao(ev.target.value as "NOVO" | "SEMINOVO")}>
+            <label htmlFor="condicao">Condição</label>
+            <select id="condicao" name="condicao" required value={condicao} onChange={(ev) => setCondicao(ev.target.value as "NOVO" | "SEMINOVO")}>
               <option value="NOVO">Novo</option>
               <option value="SEMINOVO">Seminovo</option>
             </select>
           </div>
           <div className="campo">
-            <label htmlFor="marca">Marca / estaleiro *</label>
+            <label htmlFor="marca">Marca / estaleiro</label>
             <input id="marca" name="marca" list="marcas" defaultValue={e?.marca ?? "Sessa Marine"} required />
             <datalist id="marcas"><option value="Sessa Marine" /><option value="Phantom" /><option value="Schaefer" /><option value="Azimut" /><option value="Ferretti" /></datalist>
           </div>
           <div className="campo">
-            <label htmlFor="modelo">Modelo *</label>
+            <label htmlFor="modelo">Modelo</label>
             <input id="modelo" name="modelo" placeholder="SESSA C68" defaultValue={e?.modelo} required />
           </div>
           <div className="campo">
@@ -75,7 +76,7 @@ export function FormEmbarcacao({
             </select>
           </div>
           <div className="campo">
-            <label htmlFor="preco">Preço de venda (R$) *</label>
+            <label htmlFor="preco">Preço de venda (R$)</label>
             <input id="preco" name="preco" inputMode="decimal" placeholder="399.000,00" defaultValue={e?.preco ?? ""} required />
           </div>
         </div>

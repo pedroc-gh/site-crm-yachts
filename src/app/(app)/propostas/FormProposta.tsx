@@ -64,20 +64,21 @@ export function FormProposta({ inicial, clientes, barcos }: { inicial: PropostaF
   return (
     <FormAcao acao={acao} className="form" style={{ maxWidth: 1180 }}>
       {v.id && <input type="hidden" name="id" value={v.id} />}
+      <p className="aviso-obrigatorios"><span aria-hidden="true">*</span> Campos obrigatórios</p>
       <div className="duas-colunas">
         <div className="pilha" style={{ gap: 24 }}>
           <fieldset>
             <legend className="eyebrow">Cliente e embarcação</legend>
             <div className="campos">
               <div className="campo">
-                <label htmlFor="clienteId">Cliente *</label>
+                <label htmlFor="clienteId">Cliente</label>
                 <select id="clienteId" name="clienteId" value={v.clienteId} onChange={set("clienteId")} required>
                   <option value="">Escolha…</option>
                   {clientes.map((c) => <option key={c.id} value={c.id}>{c.rotulo}</option>)}
                 </select>
               </div>
               <div className="campo">
-                <label htmlFor="embarcacaoId">Embarcação *</label>
+                <label htmlFor="embarcacaoId">Embarcação</label>
                 <select id="embarcacaoId" name="embarcacaoId" value={v.embarcacaoId} onChange={escolherBarco} required>
                   <option value="">Escolha…</option>
                   <optgroup label="Novos">
@@ -98,7 +99,7 @@ export function FormProposta({ inicial, clientes, barcos }: { inicial: PropostaF
             <legend className="eyebrow">Valores</legend>
             <div className="campos">
               <div className="campo">
-                <label htmlFor="valorTabela">Valor da embarcação (R$) *</label>
+                <label htmlFor="valorTabela">Valor da embarcação (R$)</label>
                 <input id="valorTabela" name="valorTabela" inputMode="decimal" value={v.valorTabela} onChange={set("valorTabela")} required />
                 <span className="ajuda">Preenchido com o preço do estoque. Ajuste se necessário.</span>
               </div>
@@ -147,7 +148,7 @@ export function FormProposta({ inicial, clientes, barcos }: { inicial: PropostaF
                 <input id="localEntrega" name="localEntrega" value={v.localEntrega} onChange={set("localEntrega")} placeholder="Marina, cidade" />
               </div>
               <div className="campo">
-                <label htmlFor="validade">Proposta válida até *</label>
+                <label htmlFor="validade">Proposta válida até</label>
                 <input id="validade" name="validade" type="date" value={v.validade} onChange={set("validade")} required />
               </div>
               <div className="campo campo-largo">

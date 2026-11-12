@@ -35,9 +35,10 @@ export function FormNovoUsuario() {
   }, null);
   return (
     <FormAcao ref={ref} acao={acao} className="form" style={{ gap: 16 }}>
+      <p className="aviso-obrigatorios"><span aria-hidden="true">*</span> Campos obrigatórios</p>
       <div className="campos">
-        <div className="campo"><label htmlFor="nome">Nome *</label><input id="nome" name="nome" required /></div>
-        <div className="campo"><label htmlFor="email">E-mail de acesso *</label><input id="email" name="email" type="email" required /></div>
+        <div className="campo"><label htmlFor="nome">Nome</label><input id="nome" name="nome" required /></div>
+        <div className="campo"><label htmlFor="email">E-mail de acesso</label><input id="email" name="email" type="email" required /></div>
         <div className="campo"><label htmlFor="telefone">Celular</label><input id="telefone" name="telefone" type="tel" placeholder="Sai na proposta" /></div>
         <div className="campo">
           <label htmlFor="papel">Perfil</label>

@@ -24,20 +24,21 @@ export function FormCliente({
   return (
     <FormAcao acao={acao} className="form">
       {c && <input type="hidden" name="id" value={c.id} />}
+      <p className="aviso-obrigatorios"><span aria-hidden="true">*</span> Campos obrigatórios. Telefone e e-mail: preencha pelo menos um dos dois.</p>
 
       <fieldset>
         <legend className="eyebrow">Contato</legend>
         <div className="campos">
           <div className="campo campo-largo">
-            <label htmlFor="nome">Nome completo *</label>
+            <label htmlFor="nome">Nome completo</label>
             <input id="nome" name="nome" defaultValue={c?.nome} required />
           </div>
           <div className="campo">
-            <label htmlFor="telefone">Celular / WhatsApp</label>
+            <label htmlFor="telefone" className="um-dos">Celular / WhatsApp <span>ou e-mail</span></label>
             <input id="telefone" name="telefone" type="tel" placeholder="11 95799 7972" defaultValue={c?.telefone ?? ""} />
           </div>
           <div className="campo">
-            <label htmlFor="email">E-mail</label>
+            <label htmlFor="email" className="um-dos">E-mail <span>ou celular</span></label>
             <input id="email" name="email" type="email" defaultValue={c?.email ?? ""} />
           </div>
           <div className="campo">

@@ -496,3 +496,13 @@ table.tabela { width: 100%; border-collapse: collapse; font-size: 14px; }
 @media (max-width: 860px) { .fotos-proposta { grid-template-columns: 1fr 1fr; } .fotos-proposta .slot-principal { grid-column: 1 / -1; } }
 
 .aviso-transbordo { margin-bottom: var(--space-3); }
+
+/* ---------- campos obrigatórios ----------
+   Todo campo com o atributo required ganha o * sozinho; telefone/e-mail do cliente
+   (um dos dois é obrigatório) usam .um-dos. */
+.campo:has(> :is(input, select, textarea):required) > label::after,
+.campo:has(> :is(input, select, textarea):required) > .linha-flex > label::after,
+label.um-dos::after { content: " *"; color: var(--perigo); font-weight: 700; letter-spacing: 0; }
+label.um-dos span { text-transform: none; letter-spacing: 0.02em; color: var(--ink-muted); font-weight: 400; }
+.aviso-obrigatorios { margin: 0; font-size: 13px; color: var(--ink-muted); }
+.aviso-obrigatorios span { color: var(--perigo); font-weight: 700; }
