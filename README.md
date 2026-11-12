@@ -58,21 +58,26 @@ npm run db:seed           # opcional: dados de exemplo (senha regatta2026)
 npm run dev               # http://localhost:3000
 ```
 
-## Colocar no ar
+## Colocar no ar (só pelo navegador)
 
-Recomendado: **Vercel** (site) + **Supabase** ou **Neon** (PostgreSQL).
+Recomendado: **Neon** (banco PostgreSQL, plano gratuito) + **Vercel** (site, plano gratuito).
 
-1. Crie o banco no Supabase/Neon e copie a connection string.
-2. Importe este repositório na Vercel e defina `DATABASE_URL` e `AUTH_SECRET` (gere com `openssl rand -hex 32`).
-3. Aplique o banco: `DATABASE_URL=... npx prisma migrate deploy`
-4. Crie o primeiro administrador:
-   ```bash
-   DATABASE_URL=... npm run admin:create -- "Seu Nome" voce@regattayachts.com.br
-   ```
-   O comando mostra uma senha provisória.
-5. (Opcional) Aponte um subdomínio, ex.: `crm.regattayachts.com.br`.
+1. **Banco:** em neon.tech, crie uma conta e um projeto (região São Paulo, se houver). Copie a *connection string* (`postgresql://...`).
+2. **Site:** em vercel.com, entre com o GitHub → **Add New → Project** → importe `site-crm-yachts`.
+3. Antes de clicar em Deploy, abra **Environment Variables** e crie:
+   - `DATABASE_URL` = a connection string do Neon
+   - `AUTH_SECRET` = um texto aleatório com 32 caracteres ou mais
+4. **Deploy.** A publicação cria as tabelas no banco sozinha.
+5. Abra o endereço que a Vercel mostrar. Como o banco está vazio, o site abre em **Criar administrador**: cadastre-se logo em seguida. Essa tela some depois do primeiro cadastro.
+6. Em **Equipe**, cadastre os vendedores.
+7. (Opcional) Em Vercel → Settings → Domains, aponte um subdomínio, ex.: `crm.regattayachts.com.br`.
 
-**Não rode o seed em produção.**
+Alternativa pelo terminal para criar ou recuperar um administrador:
+```bash
+DATABASE_URL=... npm run admin:create -- "Seu Nome" voce@regattayachts.com.br
+```
+
+**Não rode o seed (dados de exemplo) em produção.**
 
 ## Cadastrar um vendedor novo
 

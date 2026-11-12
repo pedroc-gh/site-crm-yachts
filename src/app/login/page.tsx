@@ -1,11 +1,14 @@
 import { redirect } from "next/navigation";
 import { usuarioAtual } from "@/lib/auth";
+import { db } from "@/lib/db";
 import { FormLogin } from "./FormLogin";
 
 export const metadata = { title: "Entrar" };
+export const dynamic = "force-dynamic";
 
 export default async function Login() {
   if (await usuarioAtual()) redirect("/");
+  if ((await db.usuario.count()) === 0) redirect("/primeiro-acesso");
   return (
     <main className="login">
       <section className="kv" aria-hidden="true">
