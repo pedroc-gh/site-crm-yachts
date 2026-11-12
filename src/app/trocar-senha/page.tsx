@@ -1,4 +1,5 @@
 "use client";
+import { FormAcao } from "@/components/FormAcao";
 import { useActionState } from "react";
 import Link from "next/link";
 import { trocarSenha } from "./actions";
@@ -21,7 +22,7 @@ export default function TrocarSenha() {
             Digite a senha provisória que você recebeu e escolha uma senha pessoal com 8 caracteres ou mais.
           </p>
         </div>
-        <form action={acao}>
+        <FormAcao acao={acao}>
           <div className="campo">
             <label htmlFor="atual">Senha atual ou provisória</label>
             <input id="atual" name="atual" type="password" autoComplete="current-password" required />
@@ -39,7 +40,7 @@ export default function TrocarSenha() {
             <BotaoEnviar>Salvar senha</BotaoEnviar>
             <Link href="/" className="btn btn-texto">Voltar</Link>
           </div>
-        </form>
+        </FormAcao>
       </section>
     </main>
   );

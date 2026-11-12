@@ -68,3 +68,6 @@ export const UFS = "AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN 
 
 /** Limite de linhas em "Itens e equipamentos" (cabe numa página A4 da proposta). */
 export const MAX_ITENS = 30;
+
+/** Fotos da proposta: 1 principal (costado) + até 3 de detalhe. */
+export const MAX_DETALHES = 3;

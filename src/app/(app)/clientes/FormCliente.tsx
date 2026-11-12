@@ -1,4 +1,5 @@
 "use client";
+import { FormAcao } from "@/components/FormAcao";
 import { useActionState } from "react";
 import Link from "next/link";
 import type { Cliente } from "@prisma/client";
@@ -21,7 +22,7 @@ export function FormCliente({
   const [erro, acao] = useActionState(salvarCliente, null);
   const c = cliente;
   return (
-    <form action={acao} className="form">
+    <FormAcao acao={acao} className="form">
       {c && <input type="hidden" name="id" value={c.id} />}
 
       <fieldset>
@@ -119,6 +120,6 @@ export function FormCliente({
         <BotaoEnviar>{c ? "Salvar alterações" : "Cadastrar cliente"}</BotaoEnviar>
         <Link className="btn" href={c ? `/clientes/${c.id}` : "/clientes"}>Cancelar</Link>
       </div>
-    </form>
+    </FormAcao>
   );
 }

@@ -393,51 +393,72 @@ table.tabela { width: 100%; border-collapse: collapse; font-size: 14px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 .cartao .sr-mover { display: grid; gap: 2px; margin-top: 4px; }
 
-/* ---------- documento da proposta: páginas A4 (210 × 297 mm) ---------- */
-.doc-rolagem { overflow-x: auto; padding-bottom: var(--space-4); }
-.doc { display: grid; gap: var(--space-4); justify-content: center; color: var(--preto); }
-.pagina { width: 210mm; height: 297mm; background: var(--branco); border: 1px solid var(--line); display: flex; flex-direction: column; overflow: hidden; position: relative; }
-.pagina-final { height: auto; min-height: 297mm; overflow: visible; }
-.doc-num-pagina { position: absolute; right: 14mm; bottom: 7mm; font-size: 9px; letter-spacing: 0.24em; color: var(--cinza); font-variant-numeric: tabular-nums; }
-.doc-capa { position: relative; flex: 1 1 auto; min-height: 90mm; background: var(--azul-profundo) center / cover no-repeat; color: var(--branco); display: flex; flex-direction: column; justify-content: space-between; padding: 14mm 15mm; }
-.doc-capa::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20,34,52,0.35) 0%, rgba(20,34,52,0) 35%, rgba(20,34,52,0.88) 100%); }
-.doc-capa > * { position: relative; }
-.doc-logo { width: 46mm; }
-.doc-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.32em; text-transform: uppercase; margin: 0 0 12px; color: var(--gelo); }
-.doc-modelo { font-family: var(--font-display); font-weight: 300; font-size: 84px; letter-spacing: 0.16em; line-height: 0.95; text-transform: uppercase; margin: 0; overflow-wrap: anywhere; }
-.doc-filete { width: 32mm; height: 1px; background: var(--turquesa); margin: 20px 0 12px; }
-.doc-numero { font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; margin: 0; color: var(--gelo); font-variant-numeric: tabular-nums; }
-.doc-bloco { padding: 9mm 15mm; border-bottom: 1px solid var(--gelo); flex: 0 0 auto; }
-.doc-gelo { background: var(--gelo); border-bottom: 0; }
-.doc-partes { display: grid; grid-template-columns: 1fr 1fr; gap: 10mm; }
-.doc-rotulo { font-size: 10px; font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase; color: var(--petroleo); margin: 0 0 6px; }
-.doc-nome { font-family: var(--font-display); font-size: 28px; letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 6px; line-height: 1; }
-.doc-texto { margin: 0; font-size: 13px; line-height: 1.6; }
-.doc-lead { margin: 0; font-size: 16px; font-weight: 300; line-height: 1.55; white-space: pre-wrap; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
-.doc-titulo { font-family: var(--font-display); font-weight: 400; font-size: 28px; letter-spacing: 0.16em; text-transform: uppercase; margin: 0 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--turquesa); }
-.doc-ficha { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 6mm; margin: 0; }
-.doc-ficha div { padding: 8px 0; border-bottom: 1px solid rgba(20,34,52,0.12); min-width: 0; }
-.doc-ficha dt { font-size: 9.5px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--petroleo); font-weight: 600; }
-.doc-gelo .doc-ficha dt { color: var(--azul-profundo); opacity: 0.75; }
-.doc-ficha dd { margin: 2px 0 0; font-size: 14px; font-weight: 500; overflow-wrap: anywhere; }
-.doc-condicoes { grid-template-columns: repeat(2, 1fr); }
-.doc-condicoes .largo { grid-column: 1 / -1; }
-.doc-equip { columns: 2; column-gap: 8mm; margin: 0; padding: 0; list-style: none; font-size: 12.5px; line-height: 1.35; }
-.doc-equip li { padding: 4px 0 4px 14px; position: relative; break-inside: avoid; }
-.doc-equip li::before { content: ""; position: absolute; left: 0; top: 11px; width: 6px; height: 1px; background: var(--turquesa); }
-.doc-valores { width: 100%; border-collapse: collapse; font-size: 13.5px; font-variant-numeric: tabular-nums; }
-.doc-valores td { padding: 8px 0; border-bottom: 1px solid var(--gelo); }
-.doc-valores td:last-child { text-align: right; white-space: nowrap; padding-left: 16px; }
-.doc-total { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 14px; padding: 14px 18px; background: var(--dourado); color: var(--azul-profundo); }
-.doc-total span { font-size: 11px; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; }
-.doc-total strong { font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums; }
-.doc-obs { margin-top: 14px; white-space: pre-wrap; color: #3d4a4d; }
-.doc-fecho { margin-top: auto; background: var(--azul-profundo); color: var(--branco); text-align: center; padding: 12mm 15mm; outline: 1px solid rgba(255,255,255,0.25); outline-offset: -6mm; }
-.doc-fecho-titulo { font-family: var(--font-display); font-weight: 300; font-size: 40px; letter-spacing: 0.18em; text-transform: uppercase; margin: 0; line-height: 1; }
-.doc-fecho-texto { font-weight: 300; letter-spacing: 0.3em; text-transform: uppercase; font-size: 11px; color: var(--nevoa); margin: 12px 0 18px; }
-.doc-fecho-contato { margin: 0; font-size: 12px; color: var(--gelo); }
-.doc-rodape { background: var(--nevoa); color: var(--azul-profundo); text-align: center; font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; padding: 10px; }
-.doc-capa, .doc-gelo, .doc-total, .doc-fecho, .doc-rodape { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+/* ---------- proposta: UMA folha A4 (210 × 297 mm) ----------
+   Hierarquia: modelo (Tungsten 46pt) > valor final (dourado) > títulos de seção (Tungsten 13pt + filete)
+   > nomes (Tungsten 14pt) > rótulos (Work Sans 6.3pt caixa alta) e dados (Work Sans 8.5pt).
+   --e é a escala do texto do corpo, reduzida automaticamente se o conteúdo não couber. */
+.doc-rolagem { overflow-x: auto; padding-bottom: var(--space-4); display: grid; justify-content: center; }
+.folha {
+  --e: 1;
+  width: 210mm; height: 297mm; overflow: hidden;
+  background: var(--branco); color: var(--preto);
+  border: 1px solid var(--line);
+  display: flex; flex-direction: column;
+  font-family: var(--font-sans);
+}
+.folha p { margin: 0; }
+.folha, .folha * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+.f-topo { flex: 0 0 auto; height: 15mm; background: var(--azul-profundo); color: var(--branco); display: flex; align-items: center; justify-content: space-between; padding: 0 10mm; }
+.f-logo { width: 34mm; }
+.f-topo-dados { display: grid; justify-items: end; gap: 1mm; font-size: 6.5pt; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gelo); font-variant-numeric: tabular-nums; }
+.f-topo-dados span:first-child { color: var(--branco); font-weight: 600; }
+
+.f-hero { flex: 0 0 auto; position: relative; height: 68mm; background: var(--azul-profundo) center / cover no-repeat; color: var(--branco); display: flex; align-items: flex-end; }
+.f-hero::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20,34,52,0) 40%, rgba(20,34,52,0.85) 100%); }
+.f-hero-texto { position: relative; padding: 0 10mm 6mm; max-width: 150mm; }
+.f-hero-eyebrow { font-size: 6.8pt; font-weight: 600; letter-spacing: 0.32em; text-transform: uppercase; color: var(--gelo); margin-bottom: 2mm !important; }
+.f-modelo { font-family: var(--font-display); font-weight: 300; font-size: 46pt; line-height: 0.92; letter-spacing: 0.14em; text-transform: uppercase; margin: 0; }
+.f-filete { width: 28mm; height: 1px; background: var(--turquesa); margin: 3.5mm 0 2.5mm; }
+.f-hero-lead { font-size: 8pt; font-weight: 300; line-height: 1.45; color: var(--gelo); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+.f-detalhes { flex: 0 0 auto; display: grid; gap: 1.5mm; padding-top: 1.5mm; height: 29.5mm; }
+.f-detalhes img { width: 100%; height: 28mm; object-fit: cover; }
+
+.f-partes { flex: 0 0 auto; display: grid; grid-template-columns: 1.1fr 1.3fr 0.8fr; gap: 6mm; padding: 4mm 10mm 3.5mm; border-bottom: 1px solid var(--gelo); }
+.f-partes > div { min-width: 0; }
+.f-rotulo, .f-ficha dt { font-size: calc(6.3pt * var(--e)); font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--petroleo); }
+.f-rotulo { font-size: 6.3pt; margin-bottom: 1mm !important; }
+.f-nome { font-family: var(--font-display); font-size: 14pt; letter-spacing: 0.1em; text-transform: uppercase; line-height: 1.05; overflow-wrap: anywhere; }
+.f-dado { font-size: 7.5pt; color: #3d4a4d; margin-top: 0.8mm !important; overflow-wrap: anywhere; }
+
+.f-corpo { flex: 1 1 auto; min-height: 0; overflow: hidden; display: grid; gap: calc(4.5mm * var(--e)); padding: 4.5mm 10mm 3.5mm; align-content: start; }
+.f-linha { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; align-items: start; }
+.f-col { display: grid; gap: calc(4.5mm * var(--e)); align-content: start; min-width: 0; }
+.f-titulo { font-family: var(--font-display); font-weight: 400; font-size: calc(13pt * var(--e)); letter-spacing: 0.16em; text-transform: uppercase; line-height: 1; margin: 0 0 calc(2mm * var(--e)); padding-bottom: calc(1.6mm * var(--e)); border-bottom: 1px solid var(--turquesa); }
+.f-ficha { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 4mm; margin: 0; }
+.f-ficha div { padding: calc(1.3mm * var(--e)) 0; border-bottom: 1px solid var(--gelo); min-width: 0; }
+.f-ficha dd { margin: 0.4mm 0 0; font-size: calc(8.3pt * var(--e)); font-weight: 500; overflow-wrap: anywhere; line-height: 1.25; }
+.f-condicoes { grid-template-columns: 1fr 1fr; }
+.f-condicoes .largo { grid-column: 1 / -1; }
+.f-itens { columns: 3; column-gap: 5mm; margin: 0; padding: 0; list-style: none; font-size: calc(7.6pt * var(--e)); line-height: 1.3; }
+.f-itens li { position: relative; padding: calc(0.7mm * var(--e)) 0 calc(0.7mm * var(--e)) 3mm; break-inside: avoid; }
+.f-itens li::before { content: ""; position: absolute; left: 0; top: calc(2.6mm * var(--e)); width: 1.6mm; height: 1px; background: var(--turquesa); }
+.f-valores { width: 100%; border-collapse: collapse; font-size: calc(8.3pt * var(--e)); font-variant-numeric: tabular-nums; }
+.f-valores td { padding: calc(1.4mm * var(--e)) 0; border-bottom: 1px solid var(--gelo); vertical-align: top; }
+.f-valores td:last-child { text-align: right; white-space: nowrap; padding-left: 3mm; }
+.f-total { display: flex; justify-content: space-between; align-items: center; gap: 3mm; margin-top: calc(2.5mm * var(--e)); padding: calc(3mm * var(--e)) 4mm; background: var(--dourado); color: var(--azul-profundo); }
+.f-total span { font-size: 6.8pt; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; }
+.f-total strong { font-size: calc(15pt * var(--e)); font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.f-obs { margin-top: calc(2mm * var(--e)) !important; font-size: calc(7.3pt * var(--e)); line-height: 1.4; color: #3d4a4d; white-space: pre-wrap; }
+
+.f-rodape { flex: 0 0 auto; margin-top: auto; }
+.f-fecho { background: var(--azul-profundo); color: var(--branco); display: flex; justify-content: space-between; align-items: center; gap: 6mm; padding: 3.2mm 10mm; }
+.f-fecho-titulo { font-family: var(--font-display); font-weight: 300; font-size: 16pt; letter-spacing: 0.2em; text-transform: uppercase; line-height: 1; }
+.f-fecho-contato { font-size: 7.5pt; color: var(--gelo); letter-spacing: 0.06em; text-align: right; }
+.f-assinatura { background: var(--nevoa); color: var(--azul-profundo); text-align: center; font-size: 6.3pt; letter-spacing: 0.26em; text-transform: uppercase; padding: 1.8mm; }
+
+.aviso-fotos { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; justify-content: space-between; margin-bottom: var(--space-3); }
 
 .barra-proposta { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; justify-content: space-between; margin-bottom: var(--space-4); }
 .barra-proposta form { display: contents; }
@@ -446,12 +467,23 @@ table.tabela { width: 100%; border-collapse: collapse; font-size: 14px; }
   @page { size: A4; margin: 0; }
   html, body { background: #fff; }
   .lateral, .nao-imprimir, .cabecalho { display: none !important; }
-  .app { display: block; }
-  .conteudo, .doc-rolagem { padding: 0; overflow: visible; }
-  .doc { display: block; }
-  .pagina { border: 0; break-after: page; }
-  .pagina:last-child { break-after: auto; }
-  .pagina-final .doc-bloco { break-inside: avoid; }
+  .app { display: block; min-height: 0; }
+  .conteudo, .doc-rolagem { padding: 0; overflow: visible; display: block; }
+  .folha { border: 0; break-after: avoid; break-inside: avoid; }
 }
 
 .tabela td.num { white-space: nowrap; }
+
+/* fotos da proposta na página da embarcação */
+.fotos-proposta { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: var(--space-2); }
+.fotos-proposta .slot { margin: 0; border: 1px solid var(--line); display: grid; grid-template-rows: auto auto; min-width: 0; }
+.fotos-proposta .slot img, .fotos-proposta .slot-vazio { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.fotos-proposta .slot-principal img, .fotos-proposta .slot-principal .slot-vazio { aspect-ratio: auto; height: 100%; min-height: 160px; }
+.fotos-proposta .slot-principal { grid-template-rows: 1fr auto; }
+.fotos-proposta .slot-vazio { display: grid; place-items: center; background: var(--surface-alt); color: var(--ink-muted); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; text-align: center; padding: 8px; border: 1px dashed var(--nevoa); }
+.fotos-proposta figcaption { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; padding: 6px 8px; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-muted); }
+.fotos-proposta .slot-acao { min-height: 22px; padding: 0; font-size: 10px; }
+.fotos-proposta .slot-acao.perigo { color: var(--perigo); }
+@media (max-width: 860px) { .fotos-proposta { grid-template-columns: 1fr 1fr; } .fotos-proposta .slot-principal { grid-column: 1 / -1; } }
+
+.aviso-transbordo { margin-bottom: var(--space-3); }

@@ -1,4 +1,5 @@
 "use client";
+import { FormAcao } from "@/components/FormAcao";
 import { useActionState, useRef } from "react";
 import { registrarInteracao } from "../actions";
 import { TIPOS_INTERACAO } from "@/lib/rotulos";
@@ -12,7 +13,7 @@ export function NovaInteracao({ clienteId }: { clienteId: string }) {
     return r;
   }, null);
   return (
-    <form ref={ref} action={acao} className="nova-interacao">
+    <FormAcao ref={ref} acao={acao} className="nova-interacao">
       <input type="hidden" name="clienteId" value={clienteId} />
       <div className="linha">
         <div className="campo">
@@ -34,6 +35,6 @@ export function NovaInteracao({ clienteId }: { clienteId: string }) {
         <BotaoEnviar className="btn btn-escuro btn-sm" pendente="Registrando…">Registrar contato</BotaoEnviar>
       </div>
       {erro && <p className="erro" role="alert">{erro}</p>}
-    </form>
+    </FormAcao>
   );
 }

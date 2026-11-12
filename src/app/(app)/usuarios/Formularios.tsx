@@ -1,5 +1,6 @@
 "use client";
-import { useActionState, useState } from "react";
+import { FormAcao } from "@/components/FormAcao";
+import { useActionState, useRef, useState } from "react";
 import { criarUsuario, redefinirSenha, type ResultadoUsuario } from "./actions";
 import { BotaoEnviar } from "@/components/BotaoEnviar";
 
@@ -26,9 +27,14 @@ function SenhaGerada({ r }: { r: NonNullable<ResultadoUsuario> }) {
 }
 
 export function FormNovoUsuario() {
-  const [r, acao] = useActionState(criarUsuario, null);
+  const ref = useRef<HTMLFormElement>(null);
+  const [r, acao] = useActionState(async (prev: ResultadoUsuario, f: FormData) => {
+    const res = await criarUsuario(prev, f);
+    if (res?.senha) ref.current?.reset(); // limpa só quando o acesso foi criado
+    return res;
+  }, null);
   return (
-    <form action={acao} className="form" style={{ gap: 16 }}>
+    <FormAcao ref={ref} acao={acao} className="form" style={{ gap: 16 }}>
       <div className="campos">
         <div className="campo"><label htmlFor="nome">Nome *</label><input id="nome" name="nome" required /></div>
         <div className="campo"><label htmlFor="email">E-mail de acesso *</label><input id="email" name="email" type="email" required /></div>
@@ -44,17 +50,17 @@ export function FormNovoUsuario() {
       {r?.erro && <p className="erro" role="alert">{r.erro}</p>}
       {r?.senha && <SenhaGerada r={r} />}
       <div><BotaoEnviar pendente="Criando…">Criar acesso</BotaoEnviar></div>
-    </form>
+    </FormAcao>
   );
 }
 
 export function FormRedefinirSenha({ id }: { id: string }) {
   const [r, acao] = useActionState(redefinirSenha, null);
   return (
-    <form action={acao} style={{ display: "grid", gap: 8 }}>
+    <FormAcao acao={acao} style={{ display: "grid", gap: 8 }}>
       <input type="hidden" name="id" value={id} />
       <BotaoEnviar className="btn btn-sm" pendente="Gerando…">Nova senha provisória</BotaoEnviar>
       {r?.senha && <SenhaGerada r={r} />}
-    </form>
+    </FormAcao>
   );
 }

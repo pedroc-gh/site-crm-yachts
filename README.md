@@ -12,7 +12,7 @@ Visual baseado no design system **Regatta Yachts** (Brand Book V04): Tungsten Co
 | Painel | todos | Clientes em atendimento, contatos atrasados, propostas em aberto, vendas do mês, agenda dos próximos 7 dias. |
 | Funil | todos | Kanban com 8 etapas. Arraste o cartão (ou use "Mover para") para mudar a etapa. |
 | Clientes | todos | Cadastro completo, perfil de compra, histórico de contatos (ligação, WhatsApp, sea trial...), próximo contato. |
-| Embarcações | todos | Catálogo de novos e estoque de seminovos, ficha técnica, equipamentos e fotos. |
+| Embarcações | todos | Catálogo de novos e estoque de seminovos, ficha técnica, até 30 itens e equipamentos, 1 foto principal (costado) e 3 de detalhe. |
 | Propostas | todos | Cálculo automático (opcionais, desconto, troca, entrada, parcelas) e documento pronto para PDF. |
 | Equipe | administrador | Cria acessos, gera senha provisória, desativa, transfere carteira. |
 
@@ -85,14 +85,26 @@ Esqueceu a senha: **Nova senha provisória**. Saiu da empresa: **Transferir cart
 
 ## Proposta em PDF
 
-Na proposta, **Baixar PDF / imprimir** abre a impressão do navegador já no formato A4 da marca (capa com a foto do barco, ficha técnica, equipamentos, investimento, condições e contato do consultor). Escolha "Salvar como PDF".
+A proposta é **uma única folha A4** (210 × 297 mm), na ordem de leitura:
+
+1. Topo com logo, número e data
+2. Foto principal do costado, com o nome do modelo
+3. Três fotos de detalhe
+4. Cliente, consultor e validade
+5. Ficha técnica e condições | investimento e **valor final** (em dourado)
+6. Itens e equipamentos (até 30, em 3 colunas)
+7. Rodapé com o contato do consultor
+
+Se o conteúdo for longo (muitos itens ou opcionais), o texto do corpo diminui sozinho, até 72%, para caber na folha. Se mesmo assim não couber, um aviso aparece acima da proposta. Também aparece um aviso quando faltam fotos da embarcação.
+
+Para baixar, use **Baixar PDF / imprimir** e escolha "Salvar como PDF".
 
 ## Estrutura
 
 ```
 prisma/schema.prisma       tabelas
 prisma/seed.ts             dados de exemplo
-scripts/criar-admin.ts     primeiro administrador
+scripts/criar-admin.mts     primeiro administrador
 src/lib/auth.ts            sessão, permissões, senhas
 src/app/(app)/             telas internas (painel, funil, clientes, embarcações, propostas, equipe)
 src/components/DocumentoProposta.tsx   layout da proposta

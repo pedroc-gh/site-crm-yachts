@@ -1,4 +1,5 @@
 "use client";
+import { FormAcao } from "@/components/FormAcao";
 import { useActionState, useMemo, useState } from "react";
 import Link from "next/link";
 import { salvarProposta } from "./actions";
@@ -61,7 +62,7 @@ export function FormProposta({ inicial, clientes, barcos }: { inicial: PropostaF
   const descontoPct = lerValor(v.valorTabela) > 0 ? (lerValor(v.desconto) / lerValor(v.valorTabela)) * 100 : 0;
 
   return (
-    <form action={acao} className="form" style={{ maxWidth: 1180 }}>
+    <FormAcao acao={acao} className="form" style={{ maxWidth: 1180 }}>
       {v.id && <input type="hidden" name="id" value={v.id} />}
       <div className="duas-colunas">
         <div className="pilha" style={{ gap: 24 }}>
@@ -179,6 +180,6 @@ export function FormProposta({ inicial, clientes, barcos }: { inicial: PropostaF
           </div>
         </aside>
       </div>
-    </form>
+    </FormAcao>
   );
 }

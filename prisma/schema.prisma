@@ -153,8 +153,15 @@ model Embarcacao {
   @@map("embarcacoes")
 }
 
+// Na proposta: 1 foto PRINCIPAL (costado do barco) + até 3 de DETALHE
+enum PapelFoto {
+  PRINCIPAL
+  DETALHE
+}
+
 model Foto {
   id           String     @id @default(cuid())
+  papel        PapelFoto  @default(DETALHE)
   embarcacaoId String
   embarcacao   Embarcacao @relation(fields: [embarcacaoId], references: [id], onDelete: Cascade)
   mime         String

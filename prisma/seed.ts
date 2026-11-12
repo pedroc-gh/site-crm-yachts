@@ -29,7 +29,7 @@ async function main() {
       combustivel: "Diesel", cabines: 4, capacidade: 18, cor: "Branco", localizacao: "Estaleiro, Itália", preco: 21500000, status: "ENCOMENDA",
       equipamentos: "Flybridge com hard top\nGerador 2x 17,5 kW\nAr-condicionado em todas as cabines\nEstabilizador giroscópico\nPlataforma de popa hidráulica\nJoystick de atracação",
       descricao: "Design italiano, quatro cabines e um flybridge pensado para receber a família inteira. A Sessa C68 é feita para quem vive o mar sem pressa.",
-      fotos: { create: { mime: "image/jpeg", dados: readFileSync("public/barcos/sessa-c68.jpg"), ordem: 0 } },
+      fotos: { create: [{ papel: "PRINCIPAL", mime: "image/jpeg", dados: readFileSync("public/barcos/sessa-c68.jpg"), ordem: 0 }, ...[1, 2, 3].map((i) => ({ papel: "DETALHE" as const, mime: "image/jpeg", dados: readFileSync(`prisma/exemplos/c68-detalhe-${i}.jpg`), ordem: i }))] },
     },
   });
   const p345 = await db.embarcacao.create({
@@ -39,7 +39,7 @@ async function main() {
       inscricao: "Exemplo 000123", preco: 399000, status: "DISPONIVEL",
       equipamentos: "Revisão completa\nCapota nova\nGPS e sonda\nGeladeira\nChuveiro de popa",
       descricao: "Revisado e com garantia. Pronto para navegar neste verão.",
-      fotos: { create: { mime: "image/jpeg", dados: readFileSync("public/barcos/phantom-345.jpg"), ordem: 0 } },
+      fotos: { create: [{ papel: "PRINCIPAL", mime: "image/jpeg", dados: readFileSync("public/barcos/phantom-345.jpg"), ordem: 0 }, ...[1, 2, 3].map((i) => ({ papel: "DETALHE" as const, mime: "image/jpeg", dados: readFileSync(`prisma/exemplos/p345-detalhe-${i}.jpg`), ordem: i }))] },
     },
   });
   await db.embarcacao.create({

@@ -20,7 +20,7 @@ export default async function Embarcacoes({ searchParams }: { searchParams: Prom
 
   const barcos = await db.embarcacao.findMany({
     where,
-    include: { fotos: { select: { id: true }, orderBy: { ordem: "asc" }, take: 1 } },
+    include: { fotos: { select: { id: true }, where: { papel: "PRINCIPAL" }, take: 1 } },
     orderBy: [{ condicao: "asc" }, { preco: "desc" }],
   });
   const aba = (t: string, rotulo: string) => {

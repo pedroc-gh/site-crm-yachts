@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { exigirUsuario } from "@/lib/auth";
 import { data, numeroProposta, reais } from "@/lib/formato";
+import { MAX_DETALHES } from "@/lib/rotulos";
 import { TagCondicao, TagStatusEmbarcacao, TagStatusProposta } from "@/components/Tags";
 import { FormEmbarcacao } from "../FormEmbarcacao";
 import { excluirEmbarcacao, fotoPrincipal, removerFoto } from "../actions";
@@ -20,7 +21,7 @@ export default async function Embarcacao({
   const b = await db.embarcacao.findUnique({
     where: { id },
     include: {
-      fotos: { select: { id: true }, orderBy: { ordem: "asc" } },
+      fotos: { select: { id: true, papel: true }, orderBy: { ordem: "asc" } },
       propostas: {
         where: u.papel === "ADMIN" ? {} : { vendedorId: u.id },
         include: { cliente: { select: { nome: true } } },
@@ -29,6 +30,10 @@ export default async function Embarcacao({
     },
   });
   if (!b) notFound();
+  const principal = b.fotos.find((f) => f.papel === "PRINCIPAL");
+  const todosDetalhes = b.fotos.filter((f) => f.papel === "DETALHE");
+  const detalhes = todosDetalhes.slice(0, MAX_DETALHES);
+  const extras = todosDetalhes.slice(MAX_DETALHES);
 
   return (
     <>
@@ -45,24 +50,39 @@ export default async function Embarcacao({
       {salvo && <p className="aviso aviso-ok" role="status">Embarcação salva.</p>}
       {erro === "proposta" && <p className="aviso" role="alert">Há propostas com esta embarcação. Marque-a como vendida em vez de excluir.</p>}
 
-      {b.fotos.length > 0 && (
-        <section className="secao" style={{ marginBottom: 40 }}>
-          <header><h2 className="display display-sm">Fotos</h2><span className="muted" style={{ fontSize: 13 }}>A primeira é a capa da proposta</span></header>
-          <div className="fotos-edicao">
-            {b.fotos.map((f, i) => (
-              <figure key={f.id}>
-                <img src={`/api/fotos/${f.id}`} alt={`${b.modelo}, foto ${i + 1}`} />
-                <figcaption>
-                  {i === 0 ? <span>CAPA</span> : (
-                    <form action={fotoPrincipal}><input type="hidden" name="fotoId" value={f.id} /><button className="btn btn-texto btn-sm" style={{ minHeight: 24, padding: 0 }}>Usar na capa</button></form>
-                  )}
-                  <form action={removerFoto}><input type="hidden" name="fotoId" value={f.id} /><button className="btn btn-texto btn-sm" style={{ minHeight: 24, padding: 0, color: "var(--perigo)" }}>Remover</button></form>
-                </figcaption>
-              </figure>
-            ))}
-          </div>
-        </section>
-      )}
+      <section className="secao" style={{ marginBottom: 40 }}>
+        <header>
+          <h2 className="display display-sm">Fotos da proposta</h2>
+          <span className="muted" style={{ fontSize: 13 }}>1 principal (costado) + {MAX_DETALHES} de detalhe</span>
+        </header>
+        <div className="fotos-proposta">
+          <figure className="slot slot-principal">
+            {principal ? <img src={`/api/fotos/${principal.id}`} alt={`${b.modelo}, costado`} /> : <span className="slot-vazio">Falta a foto do costado</span>}
+            <figcaption>
+              <span>Principal · costado</span>
+              {principal && (
+                <form action={removerFoto}><input type="hidden" name="fotoId" value={principal.id} /><button className="btn btn-texto btn-sm slot-acao perigo">Remover</button></form>
+              )}
+            </figcaption>
+          </figure>
+          {Array.from({ length: MAX_DETALHES }, (_, i) => detalhes[i]).map((f, i) => (
+            <figure className="slot" key={f?.id ?? `vazio-${i}`}>
+              {f ? <img src={`/api/fotos/${f.id}`} alt={`${b.modelo}, detalhe ${i + 1}`} /> : <span className="slot-vazio">Detalhe {i + 1} · falta</span>}
+              <figcaption>
+                <span>Detalhe {i + 1}</span>
+                {f && (
+                  <span className="linha-flex" style={{ gap: 10 }}>
+                    <form action={fotoPrincipal}><input type="hidden" name="fotoId" value={f.id} /><button className="btn btn-texto btn-sm slot-acao">Tornar principal</button></form>
+                    <form action={removerFoto}><input type="hidden" name="fotoId" value={f.id} /><button className="btn btn-texto btn-sm slot-acao perigo">Remover</button></form>
+                  </span>
+                )}
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+        {extras.length > 0 && <p className="muted" style={{ margin: 0, fontSize: 13 }}>{extras.length} foto(s) a mais não entram na proposta.</p>}
+        <p className="muted" style={{ margin: 0, fontSize: 13 }}>Para enviar fotos, use o campo “Fotos da proposta” no fim do formulário abaixo.</p>
+      </section>
 
       {b.propostas.length > 0 && (
         <section className="secao" style={{ marginBottom: 40 }}>
@@ -81,6 +101,8 @@ export default async function Embarcacao({
       <section className="secao">
         <header><h2 className="display display-sm">Dados da embarcação</h2></header>
         <FormEmbarcacao
+          key={b.atualizadoEm.getTime() + b.fotos.length}
+          fotosAtuais={{ principal: !!principal, detalhes: todosDetalhes.length }}
           e={{
             ...b,
             comprimentoPes: b.comprimentoPes ? b.comprimentoPes.toString().replace(".", ",") : null,

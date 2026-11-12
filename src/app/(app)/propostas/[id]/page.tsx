@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { exigirUsuario } from "@/lib/auth";
 import { numeroProposta } from "@/lib/formato";
-import { rotuloStatusProposta } from "@/lib/rotulos";
+import { rotuloStatusProposta, MAX_DETALHES } from "@/lib/rotulos";
 import { TagStatusProposta } from "@/components/Tags";
 import { DocumentoProposta } from "@/components/DocumentoProposta";
 import { BotaoImprimir } from "@/components/BotaoImprimir";
@@ -20,11 +20,16 @@ export default async function VerProposta({ params }: { params: Promise<{ id: st
     where: { id: (await params).id },
     include: {
       cliente: true,
-      embarcacao: { include: { fotos: { select: { id: true }, orderBy: { ordem: "asc" }, take: 1 } } },
+      embarcacao: { include: { fotos: { select: { id: true, papel: true }, orderBy: [{ papel: "asc" }, { ordem: "asc" }] } } },
       vendedor: { select: { nome: true, email: true, telefone: true } },
     },
   });
   if (!p || (u.papel !== "ADMIN" && p.vendedorId !== u.id)) notFound();
+  const qtdDetalhes = p.embarcacao.fotos.filter((f) => f.papel === "DETALHE").length;
+  const faltam = [
+    !p.embarcacao.fotos.some((f) => f.papel === "PRINCIPAL") && "a foto principal (costado)",
+    qtdDetalhes < MAX_DETALHES && `${MAX_DETALHES - qtdDetalhes} foto(s) de detalhe`,
+  ].filter(Boolean) as string[];
 
   return (
     <>
@@ -53,6 +58,15 @@ export default async function VerProposta({ params }: { params: Promise<{ id: st
           <BotaoImprimir />
         </div>
       </div>
+      {faltam.length > 0 && (
+        <div className="aviso aviso-fotos nao-imprimir" role="status">
+          <span>Faltam fotos desta embarcação na proposta: {faltam.join(" e ")}.</span>
+          <Link className="btn btn-sm" href={`/embarcacoes/${p.embarcacaoId}`}>Enviar fotos</Link>
+        </div>
+      )}
+      <p id="aviso-transbordo" className="aviso aviso-transbordo nao-imprimir" role="alert" hidden>
+        O conteúdo não coube inteiro na folha A4. Encurte os itens e equipamentos, os opcionais ou as observações.
+      </p>
       <DocumentoProposta p={p} />
     </>
   );

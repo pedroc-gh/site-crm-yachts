@@ -5,7 +5,7 @@ import type { Condicao, StatusEmbarcacao } from "@prisma/client";
 import { db } from "@/lib/db";
 import { exigirUsuario } from "@/lib/auth";
 import { lerValor } from "@/lib/formato";
-import { MAX_ITENS } from "@/lib/rotulos";
+import { MAX_ITENS, MAX_DETALHES } from "@/lib/rotulos";
 
 const txt = (f: FormData, k: string) => {
   const v = String(f.get(k) ?? "").trim();
@@ -19,14 +19,47 @@ const int = (f: FormData, k: string) => {
 const MAX_FOTO = 6 * 1024 * 1024;
 const TIPOS = ["image/jpeg", "image/png", "image/webp"];
 
-async function salvarFotos(embarcacaoId: string, form: FormData) {
-  const arquivos = form.getAll("fotos").filter((f): f is File => f instanceof File && f.size > 0);
+
+
+function arquivos(form: FormData, campo: string) {
+  return form.getAll(campo).filter((f): f is File => f instanceof File && f.size > 0);
+}
+
+function validar(f: File) {
+  if (!TIPOS.includes(f.type)) throw new Error(`"${f.name}" não é JPG, PNG ou WebP.`);
+  if (f.size > MAX_FOTO) throw new Error(`"${f.name}" tem mais de 6 MB. Reduza a foto antes de enviar.`);
+}
+
+/** Confere as fotos antes de salvar qualquer dado. */
+async function conferirFotos(embarcacaoId: string | null, form: FormData) {
+  const principal = arquivos(form, "fotoPrincipal");
+  const detalhes = arquivos(form, "fotosDetalhe");
+  [...principal, ...detalhes].forEach(validar);
+  if (principal.length > 1) throw new Error("Envie só uma foto principal.");
+  const existentes = embarcacaoId ? await db.foto.count({ where: { embarcacaoId, papel: "DETALHE" } }) : 0;
+  if (existentes + detalhes.length > MAX_DETALHES) {
+    const livres = MAX_DETALHES - existentes;
+    throw new Error(
+      livres <= 0
+        ? `Já existem ${MAX_DETALHES} fotos de detalhe. Remova uma antes de enviar outra.`
+        : `Cabem só mais ${livres} foto(s) de detalhe (máximo ${MAX_DETALHES}).`,
+    );
+  }
+  return { principal: principal[0], detalhes };
+}
+
+async function salvarFotos(embarcacaoId: string, fotos: { principal?: File; detalhes: File[] }) {
+  if (fotos.principal) {
+    // A nova foto principal substitui a anterior
+    await db.foto.deleteMany({ where: { embarcacaoId, papel: "PRINCIPAL" } });
+    await db.foto.create({
+      data: { embarcacaoId, papel: "PRINCIPAL", mime: fotos.principal.type, dados: Buffer.from(await fotos.principal.arrayBuffer()), ordem: 0 },
+    });
+  }
   const ultima = await db.foto.aggregate({ where: { embarcacaoId }, _max: { ordem: true } });
-  let ordem = (ultima._max.ordem ?? -1) + 1;
-  for (const f of arquivos) {
-    if (!TIPOS.includes(f.type)) throw new Error(`"${f.name}" não é JPG, PNG ou WebP.`);
-    if (f.size > MAX_FOTO) throw new Error(`"${f.name}" tem mais de 6 MB. Reduza a foto antes de enviar.`);
-    await db.foto.create({ data: { embarcacaoId, mime: f.type, dados: Buffer.from(await f.arrayBuffer()), ordem: ordem++ } });
+  let ordem = (ultima._max.ordem ?? 0) + 1;
+  for (const f of fotos.detalhes) {
+    await db.foto.create({ data: { embarcacaoId, papel: "DETALHE", mime: f.type, dados: Buffer.from(await f.arrayBuffer()), ordem: ordem++ } });
   }
 }
 
@@ -67,9 +100,10 @@ export async function salvarEmbarcacao(_: string | null, form: FormData): Promis
 
   let embId = id;
   try {
+    const fotos = await conferirFotos(id, form);
     if (id) await db.embarcacao.update({ where: { id }, data: dados });
     else embId = (await db.embarcacao.create({ data: dados })).id;
-    await salvarFotos(embId!, form);
+    await salvarFotos(embId!, fotos);
   } catch (e) {
     return e instanceof Error ? e.message : "Não foi possível salvar.";
   }
@@ -84,12 +118,15 @@ export async function removerFoto(form: FormData) {
   revalidatePath(`/embarcacoes/${f.embarcacaoId}`);
 }
 
+/** Troca de papel: o detalhe vira a principal e a principal antiga vira detalhe. */
 export async function fotoPrincipal(form: FormData) {
   await exigirUsuario();
   const id = String(form.get("fotoId"));
   const f = await db.foto.findUniqueOrThrow({ where: { id } });
-  const menor = await db.foto.aggregate({ where: { embarcacaoId: f.embarcacaoId }, _min: { ordem: true } });
-  await db.foto.update({ where: { id }, data: { ordem: (menor._min.ordem ?? 0) - 1 } });
+  await db.$transaction([
+    db.foto.updateMany({ where: { embarcacaoId: f.embarcacaoId, papel: "PRINCIPAL" }, data: { papel: "DETALHE", ordem: f.ordem } }),
+    db.foto.update({ where: { id }, data: { papel: "PRINCIPAL", ordem: 0 } }),
+  ]);
   revalidatePath(`/embarcacoes/${f.embarcacaoId}`);
 }
 

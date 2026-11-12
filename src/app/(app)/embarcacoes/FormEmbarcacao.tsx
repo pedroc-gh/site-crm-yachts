@@ -1,9 +1,10 @@
 "use client";
+import { FormAcao } from "@/components/FormAcao";
 import { useActionState, useState } from "react";
 import Link from "next/link";
 import { salvarEmbarcacao } from "./actions";
 import { BotaoEnviar } from "@/components/BotaoEnviar";
-import { rotuloStatusEmbarcacao, MAX_ITENS } from "@/lib/rotulos";
+import { rotuloStatusEmbarcacao, MAX_ITENS, MAX_DETALHES } from "@/lib/rotulos";
 
 const contarItens = (t: string) => t.split("\n").filter((l) => l.trim()).length;
 
@@ -28,13 +29,21 @@ export type EmbarcacaoForm = {
   descricao: string | null;
 };
 
-export function FormEmbarcacao({ e, condicaoInicial }: { e?: EmbarcacaoForm; condicaoInicial?: "NOVO" | "SEMINOVO" }) {
+export function FormEmbarcacao({
+  e,
+  condicaoInicial,
+  fotosAtuais,
+}: {
+  e?: EmbarcacaoForm;
+  condicaoInicial?: "NOVO" | "SEMINOVO";
+  fotosAtuais?: { principal: boolean; detalhes: number };
+}) {
   const [erro, acao] = useActionState(salvarEmbarcacao, null);
   const [condicao, setCondicao] = useState(e?.condicao ?? condicaoInicial ?? "NOVO");
   const [itens, setItens] = useState(e?.equipamentos ?? "");
   const qtdItens = contarItens(itens);
   return (
-    <form action={acao} className="form">
+    <FormAcao acao={acao} className="form">
       {e && <input type="hidden" name="id" value={e.id} />}
       <fieldset>
         <legend className="eyebrow">Identificação</legend>
@@ -142,12 +151,34 @@ export function FormEmbarcacao({ e, condicaoInicial }: { e?: EmbarcacaoForm; con
       </fieldset>
 
       <fieldset>
-        <legend className="eyebrow">Fotos</legend>
-        <div className="campo">
-          <label htmlFor="fotos">Adicionar fotos (JPG, PNG ou WebP, até 6 MB cada)</label>
-          <input id="fotos" name="fotos" type="file" accept="image/jpeg,image/png,image/webp" multiple />
-          <span className="ajuda">{condicao === "SEMINOVO" ? "Seminovo: foto nítida do casco inteiro, sem filtro." : "Novo: fotos que valorizam design e cenário."} A primeira foto vai para a capa da proposta.</span>
+        <legend className="eyebrow">Fotos da proposta</legend>
+        <div className="campos">
+          <div className="campo">
+            <label htmlFor="fotoPrincipal">Foto principal: costado</label>
+            <input id="fotoPrincipal" name="fotoPrincipal" type="file" accept="image/jpeg,image/png,image/webp" />
+            <span className="ajuda">
+              O barco inteiro de lado, em foto horizontal. É a imagem grande da proposta.
+              {fotosAtuais?.principal ? " Enviar outra substitui a atual." : ""}
+            </span>
+          </div>
+          <div className="campo">
+            <label htmlFor="fotosDetalhe">Fotos de detalhe ({fotosAtuais?.detalhes ?? 0} de {MAX_DETALHES})</label>
+            <input
+              id="fotosDetalhe"
+              name="fotosDetalhe"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              disabled={(fotosAtuais?.detalhes ?? 0) >= MAX_DETALHES}
+            />
+            <span className="ajuda">
+              {(fotosAtuais?.detalhes ?? 0) >= MAX_DETALHES
+                ? "Já há 3 fotos de detalhe. Remova uma para enviar outra."
+                : "Cockpit, interior, painel, flybridge. Até 3 fotos."}
+            </span>
+          </div>
         </div>
+        <span className="ajuda">JPG, PNG ou WebP, até 6 MB cada. {condicao === "SEMINOVO" ? "Seminovo: fotos nítidas, sem filtro." : "Novo: fotos que valorizam design e cenário."}</span>
       </fieldset>
 
       {erro && <p className="erro" role="alert">{erro}</p>}
@@ -159,6 +190,6 @@ export function FormEmbarcacao({ e, condicaoInicial }: { e?: EmbarcacaoForm; con
         )}
         <Link className="btn" href="/embarcacoes">Cancelar</Link>
       </div>
-    </form>
+    </FormAcao>
   );
 }
