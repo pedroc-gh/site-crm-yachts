@@ -1,0 +1,201 @@
+// Banco de dados do CRM Regatta Yachts
+// Tabelas: usuarios (vendedores e administradores), clientes, interacoes (histórico
+// do atendimento), embarcacoes (novas e seminovas), fotos e propostas.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Papel {
+  ADMIN // cadastra vendedores, barcos e vê todos os clientes
+  VENDEDOR // vê e atende apenas a própria carteira
+}
+
+// Etapas do funil de atendimento, na ordem em que o cliente avança
+enum Etapa {
+  NOVO_LEAD
+  PRIMEIRO_CONTATO
+  QUALIFICADO
+  VISITA_SEA_TRIAL
+  PROPOSTA
+  NEGOCIACAO
+  GANHO
+  PERDIDO
+}
+
+enum TipoInteracao {
+  LIGACAO
+  WHATSAPP
+  EMAIL
+  REUNIAO
+  VISITA
+  SEA_TRIAL
+  NOTA
+  MUDANCA_ETAPA
+  PROPOSTA
+}
+
+enum Condicao {
+  NOVO
+  SEMINOVO
+}
+
+enum StatusEmbarcacao {
+  DISPONIVEL
+  RESERVADA
+  VENDIDA
+  ENCOMENDA // barco novo vendido sob encomenda ao estaleiro
+}
+
+enum StatusProposta {
+  RASCUNHO
+  ENVIADA
+  ACEITA
+  RECUSADA
+  EXPIRADA
+}
+
+model Usuario {
+  id          String   @id @default(cuid())
+  nome        String
+  email       String   @unique
+  telefone    String?
+  senhaHash   String
+  papel       Papel    @default(VENDEDOR)
+  ativo       Boolean  @default(true)
+  trocarSenha Boolean  @default(true) // força troca da senha provisória no 1º acesso
+  criadoEm    DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  clientes    Cliente[]
+  interacoes  Interacao[]
+  propostas   Proposta[]
+
+  @@map("usuarios")
+}
+
+model Cliente {
+  id             String    @id @default(cuid())
+  nome           String
+  cpfCnpj        String?
+  email          String?
+  telefone       String?
+  dataNascimento DateTime?
+  cidade         String?
+  uf             String?   @db.VarChar(2)
+  profissao      String?
+  origem         String? // Indicação, Evento, Instagram, Site, RD Station, Loja...
+  interesse      Condicao? // novo, seminovo ou indefinido (null)
+  modeloInteresse String?
+  orcamento      Decimal?  @db.Decimal(14, 2)
+  possuiBarco    String? // barco atual, possível troca
+  observacoes    String?
+  etapa          Etapa     @default(NOVO_LEAD)
+  motivoPerda    String?
+  proximoContato DateTime?
+  vendedorId     String
+  vendedor       Usuario   @relation(fields: [vendedorId], references: [id])
+  criadoEm       DateTime  @default(now())
+  atualizadoEm   DateTime  @updatedAt
+
+  interacoes Interacao[]
+  propostas  Proposta[]
+
+  @@index([vendedorId, etapa])
+  @@map("clientes")
+}
+
+model Interacao {
+  id        String        @id @default(cuid())
+  clienteId String
+  cliente   Cliente       @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  usuarioId String
+  usuario   Usuario       @relation(fields: [usuarioId], references: [id])
+  tipo      TipoInteracao
+  descricao String
+  data      DateTime      @default(now())
+
+  @@index([clienteId, data])
+  @@map("interacoes")
+}
+
+model Embarcacao {
+  id             String           @id @default(cuid())
+  condicao       Condicao
+  marca          String // Sessa Marine, Phantom...
+  modelo         String // SESSA C68
+  ano            Int?
+  comprimentoPes Decimal?         @db.Decimal(5, 1)
+  motorizacao    String?
+  horasMotor     Int? // seminovo
+  combustivel    String?
+  cabines        Int?
+  capacidade     Int? // pessoas
+  cor            String?
+  localizacao    String? // marina / estaleiro
+  inscricao      String? // nº de inscrição na Capitania ou casco
+  preco          Decimal          @db.Decimal(14, 2)
+  status         StatusEmbarcacao @default(DISPONIVEL)
+  equipamentos   String? // itens de série / opcionais, um por linha
+  descricao      String?
+  criadoEm       DateTime         @default(now())
+  atualizadoEm   DateTime         @updatedAt
+
+  fotos     Foto[]
+  propostas Proposta[]
+
+  @@index([condicao, status])
+  @@map("embarcacoes")
+}
+
+model Foto {
+  id           String     @id @default(cuid())
+  embarcacaoId String
+  embarcacao   Embarcacao @relation(fields: [embarcacaoId], references: [id], onDelete: Cascade)
+  mime         String
+  dados        Bytes
+  ordem        Int        @default(0)
+  criadoEm     DateTime   @default(now())
+
+  @@map("fotos")
+}
+
+model Proposta {
+  id             String         @id @default(cuid())
+  numero         Int            @unique @default(autoincrement())
+  clienteId      String
+  cliente        Cliente        @relation(fields: [clienteId], references: [id])
+  embarcacaoId   String
+  embarcacao     Embarcacao     @relation(fields: [embarcacaoId], references: [id])
+  vendedorId     String
+  vendedor       Usuario        @relation(fields: [vendedorId], references: [id])
+  status         StatusProposta @default(RASCUNHO)
+
+  valorTabela    Decimal        @db.Decimal(14, 2)
+  opcionais      String? // um por linha: "Gerador Onan 9 kW | 85000"
+  valorOpcionais Decimal        @default(0) @db.Decimal(14, 2)
+  desconto       Decimal        @default(0) @db.Decimal(14, 2)
+  barcoTroca     String? // embarcação do cliente na troca
+  valorTroca     Decimal        @default(0) @db.Decimal(14, 2)
+  valorFinal     Decimal        @db.Decimal(14, 2)
+
+  entrada        Decimal        @default(0) @db.Decimal(14, 2)
+  parcelas       Int            @default(0)
+  valorParcela   Decimal        @default(0) @db.Decimal(14, 2)
+  formaPagamento String? // texto livre: financiamento, consórcio...
+  prazoEntrega   String?
+  localEntrega   String?
+  validade       DateTime
+  observacoes    String?
+
+  criadoEm       DateTime       @default(now())
+  atualizadoEm   DateTime       @updatedAt
+
+  @@index([vendedorId, status])
+  @@map("propostas")
+}
