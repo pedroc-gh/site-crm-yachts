@@ -12,7 +12,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     { href: "/propostas", rotulo: "Propostas" },
     { grupo: "Estoque" },
     { href: "/embarcacoes", rotulo: "Embarcações" },
-    ...(u.papel === "ADMIN" ? [{ grupo: "Administração" }, { href: "/usuarios", rotulo: "Equipe" }] : []),
+    ...(u.papel === "ADMIN" ? [{ grupo: "Administração" }, { href: "/usuarios", rotulo: "Equipe" }, { href: "/importar", rotulo: "Importar planilha" }] : []),
   ];
   return (
     <div className="app">

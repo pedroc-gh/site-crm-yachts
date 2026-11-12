@@ -15,6 +15,7 @@ Visual baseado no design system **Regatta Yachts** (Brand Book V04): Tungsten Co
 | Embarcações | todos | Catálogo de novos e estoque de seminovos, ficha técnica, até 30 itens e equipamentos, 1 foto principal (costado) e 3 de detalhe. |
 | Propostas | todos | Cálculo automático (opcionais, desconto, troca, entrada, parcelas) e documento pronto para PDF. |
 | Equipe | administrador | Cria acessos, gera senha provisória, desativa, transfere carteira. |
+| Importar planilha | administrador | Carga em lote de clientes e embarcações por Excel (.xlsx) ou CSV, com conferência antes de gravar. |
 
 **Regras de acesso:** o consultor vê apenas os próprios clientes e propostas. O administrador vê tudo, escolhe o consultor de cada cliente e gerencia a equipe.
 
@@ -88,6 +89,19 @@ DATABASE_URL=... npm run admin:create -- "Seu Nome" voce@regattayachts.com.br
 4. No primeiro login o vendedor define a senha pessoal.
 
 Esqueceu a senha: **Nova senha provisória**. Saiu da empresa: **Transferir carteira** para outro consultor e **Desativar acesso** (o histórico fica preservado).
+
+## Importar clientes e embarcações em lote
+
+Menu **Importar planilha** (só administrador):
+
+1. **Baixe o modelo** (.xlsx) de clientes ou de embarcações. Ele traz as colunas certas, menus nos campos de lista e uma aba **Instruções** com exemplos. Colunas com `*` são obrigatórias.
+2. **Envie para conferir.** Nada é gravado: o sistema mostra cada linha como *Pronta*, *Já existe* ou *Erro*, com o motivo.
+3. **Importe.** Só as linhas prontas entram. Linhas com erro podem ser corrigidas e enviadas depois.
+
+- Aceita `.xlsx` e `.csv` (vírgula ou ponto e vírgula, inclusive o CSV salvo pelo Excel em português). Até 2.000 linhas e 5 MB por arquivo.
+- Não duplica: clientes com o mesmo CPF/CNPJ, e-mail ou celular; seminovos com a mesma inscrição; novos com o mesmo modelo e ano. Vale contra o banco e dentro do próprio arquivo, então reimportar o mesmo arquivo é seguro.
+- Clientes: a coluna *E-mail do consultor* define o responsável (vazio = quem importou). Cada cliente ganha no histórico "Cliente importado da planilha".
+- Embarcações: fotos não vão na planilha. Depois de importar, envie o costado e os detalhes na página de cada barco.
 
 ## Proposta em PDF
 
