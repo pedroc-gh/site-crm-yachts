@@ -60,12 +60,13 @@ npm run dev               # http://localhost:3000
 
 ## Colocar no ar (só pelo navegador)
 
-Recomendado: **Neon** (banco PostgreSQL, plano gratuito) + **Vercel** (site, plano gratuito).
+Recomendado: **Supabase** ou **Neon** (banco PostgreSQL, plano gratuito) + **Vercel** (site, plano gratuito). O `vercel.json` roda o site em São Paulo (`gru1`), perto do banco.
 
 1. **Banco:** em neon.tech, crie uma conta e um projeto (região São Paulo, se houver). Copie a *connection string* (`postgresql://...`).
 2. **Site:** em vercel.com, entre com o GitHub → **Add New → Project** → importe `site-crm-yachts`.
 3. Antes de clicar em Deploy, abra **Environment Variables** e crie:
-   - `DATABASE_URL` = a connection string do Neon
+   - `DATABASE_URL` = a connection string do Neon (no Supabase: *Transaction pooler*, porta 6543, com `?pgbouncer=true&connection_limit=1&schema=crm`)
+   - `DIRECT_URL` = a mesma do Neon (no Supabase: *Session pooler*, porta 5432, com `?schema=crm`)
    - `AUTH_SECRET` = um texto aleatório com 32 caracteres ou mais
 4. **Deploy.** A publicação cria as tabelas no banco sozinha.
 5. Abra o endereço que a Vercel mostrar. Como o banco está vazio, o site abre em **Criar administrador**: cadastre-se logo em seguida. Essa tela some depois do primeiro cadastro.

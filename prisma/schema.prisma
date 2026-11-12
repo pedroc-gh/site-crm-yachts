@@ -7,8 +7,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL") // conexão do site (no Supabase: pooler, porta 6543)
+  directUrl = env("DIRECT_URL") // conexão para criar/alterar tabelas (no Supabase: porta 5432)
 }
 
 enum Papel {
