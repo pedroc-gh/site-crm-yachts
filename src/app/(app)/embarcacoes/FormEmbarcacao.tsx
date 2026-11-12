@@ -3,7 +3,9 @@ import { useActionState, useState } from "react";
 import Link from "next/link";
 import { salvarEmbarcacao } from "./actions";
 import { BotaoEnviar } from "@/components/BotaoEnviar";
-import { rotuloStatusEmbarcacao } from "@/lib/rotulos";
+import { rotuloStatusEmbarcacao, MAX_ITENS } from "@/lib/rotulos";
+
+const contarItens = (t: string) => t.split("\n").filter((l) => l.trim()).length;
 
 export type EmbarcacaoForm = {
   id: string;
@@ -29,6 +31,8 @@ export type EmbarcacaoForm = {
 export function FormEmbarcacao({ e, condicaoInicial }: { e?: EmbarcacaoForm; condicaoInicial?: "NOVO" | "SEMINOVO" }) {
   const [erro, acao] = useActionState(salvarEmbarcacao, null);
   const [condicao, setCondicao] = useState(e?.condicao ?? condicaoInicial ?? "NOVO");
+  const [itens, setItens] = useState(e?.equipamentos ?? "");
+  const qtdItens = contarItens(itens);
   return (
     <form action={acao} className="form">
       {e && <input type="hidden" name="id" value={e.id} />}
@@ -114,8 +118,21 @@ export function FormEmbarcacao({ e, condicaoInicial }: { e?: EmbarcacaoForm; con
             </div>
           )}
           <div className="campo campo-largo">
-            <label htmlFor="equipamentos">Equipamentos e itens de série</label>
-            <textarea id="equipamentos" name="equipamentos" rows={5} placeholder={"Um item por linha\nGerador 17,5 kW\nAr-condicionado em todas as cabines"} defaultValue={e?.equipamentos ?? ""} />
+            <label htmlFor="equipamentos">Itens e equipamentos</label>
+            <textarea
+              id="equipamentos"
+              name="equipamentos"
+              rows={8}
+              placeholder={"Um item por linha\nGerador 17,5 kW\nAr-condicionado em todas as cabines"}
+              value={itens}
+              onChange={(ev) => setItens(ev.target.value)}
+              aria-invalid={qtdItens > MAX_ITENS}
+              aria-describedby="itens-ajuda"
+            />
+            <span id="itens-ajuda" className="ajuda" style={qtdItens > MAX_ITENS ? { color: "var(--perigo)", fontWeight: 600 } : undefined}>
+              {qtdItens} de {MAX_ITENS} itens
+              {qtdItens > MAX_ITENS ? `. Remova ${qtdItens - MAX_ITENS} para salvar.` : ". Um item por linha."}
+            </span>
           </div>
           <div className="campo campo-largo">
             <label htmlFor="descricao">Texto de apresentação</label>
@@ -135,7 +152,11 @@ export function FormEmbarcacao({ e, condicaoInicial }: { e?: EmbarcacaoForm; con
 
       {erro && <p className="erro" role="alert">{erro}</p>}
       <div className="form-acoes">
-        <BotaoEnviar>{e ? "Salvar alterações" : "Cadastrar embarcação"}</BotaoEnviar>
+        {qtdItens > MAX_ITENS ? (
+          <button type="button" className="btn btn-cta" disabled>Limite de {MAX_ITENS} itens excedido</button>
+        ) : (
+          <BotaoEnviar>{e ? "Salvar alterações" : "Cadastrar embarcação"}</BotaoEnviar>
+        )}
         <Link className="btn" href="/embarcacoes">Cancelar</Link>
       </div>
     </form>

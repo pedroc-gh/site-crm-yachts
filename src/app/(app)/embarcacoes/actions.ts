@@ -5,6 +5,7 @@ import type { Condicao, StatusEmbarcacao } from "@prisma/client";
 import { db } from "@/lib/db";
 import { exigirUsuario } from "@/lib/auth";
 import { lerValor } from "@/lib/formato";
+import { MAX_ITENS } from "@/lib/rotulos";
 
 const txt = (f: FormData, k: string) => {
   const v = String(f.get(k) ?? "").trim();
@@ -40,6 +41,9 @@ export async function salvarEmbarcacao(_: string | null, form: FormData): Promis
   if (!marca || !modelo) return "Informe marca e modelo.";
   if (preco <= 0) return "Informe o preço de venda.";
 
+  const linhasItens = (txt(form, "equipamentos") ?? "").split("\n").map((l) => l.trim()).filter(Boolean);
+  if (linhasItens.length > MAX_ITENS) return `Itens e equipamentos: no máximo ${MAX_ITENS} itens (há ${linhasItens.length}).`;
+
   const pes = lerValor(form.get("comprimentoPes"));
   const dados = {
     condicao,
@@ -57,7 +61,7 @@ export async function salvarEmbarcacao(_: string | null, form: FormData): Promis
     inscricao: txt(form, "inscricao"),
     preco,
     status: (txt(form, "status") ?? "DISPONIVEL") as StatusEmbarcacao,
-    equipamentos: txt(form, "equipamentos"),
+    equipamentos: linhasItens.length ? linhasItens.join("\n") : null,
     descricao: txt(form, "descricao"),
   };
 
