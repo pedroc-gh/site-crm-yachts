@@ -2,11 +2,16 @@ import type { Proposta, Cliente, Embarcacao, Usuario, PapelFoto } from "@prisma/
 import { data, lerOpcionais, num, numeroProposta, reais, telefone } from "@/lib/formato";
 import { rotuloCondicao, MAX_ITENS, MAX_DETALHES } from "@/lib/rotulos";
 import { AjustePagina } from "./AjustePagina";
+import { proporcaoDe } from "@/lib/proporcao";
+
+const LARGURA_UTIL = 190; // mm: 210 da folha menos 10 de cada lado
+const VAO = 2; // mm entre fotos
+const ALTURA_MAX_DETALHES = 42; // mm
 
 type Props = {
   p: Proposta & {
     cliente: Cliente;
-    embarcacao: Embarcacao & { fotos: { id: string; papel: PapelFoto }[] };
+    embarcacao: Embarcacao & { fotos: { id: string; papel: PapelFoto; largura: number | null; altura: number | null }[] };
     vendedor: Pick<Usuario, "nome" | "email" | "telefone">;
   };
 };
@@ -19,7 +24,13 @@ type Props = {
 export function DocumentoProposta({ p }: Props) {
   const b = p.embarcacao;
   const principal = b.fotos.find((f) => f.papel === "PRINCIPAL");
-  const detalhes = b.fotos.filter((f) => f.papel === "DETALHE").slice(0, MAX_DETALHES);
+  // Detalhes: 4:3 horizontal ou 3:4 vertical, todos na mesma altura, ocupando a largura útil (190 mm)
+  const brutos = b.fotos.filter((f) => f.papel === "DETALHE").slice(0, MAX_DETALHES);
+  const somaProporcoes = brutos.reduce((s, f) => s + proporcaoDe(f), 0);
+  const alturaDetalhes = brutos.length
+    ? Math.min(ALTURA_MAX_DETALHES, Math.floor(((LARGURA_UTIL - VAO * (brutos.length - 1)) / somaProporcoes) * 10) / 10)
+    : 0;
+  const detalhes = brutos.map((f) => ({ ...f, larguraMm: Math.floor(alturaDetalhes * proporcaoDe(f) * 10) / 10 }));
   const opcionais = lerOpcionais(p.opcionais);
   const itens = (b.equipamentos ?? "").split("\n").map((s) => s.trim()).filter(Boolean).slice(0, MAX_ITENS);
   const ficha = [
@@ -47,42 +58,58 @@ export function DocumentoProposta({ p }: Props) {
           </div>
         </header>
 
-        <section className="f-hero" style={principal ? { backgroundImage: `url(/api/fotos/${principal.id})` } : undefined}>
-          <div className="f-hero-texto">
-            <p className="f-hero-eyebrow">
-              {[b.marca, rotuloCondicao[b.condicao], b.ano].filter(Boolean).join(" · ")}
-            </p>
-            <h1 className="f-modelo">{b.modelo}</h1>
-            <div className="f-filete" />
-            {b.descricao && <p className="f-hero-lead">{b.descricao}</p>}
+        <section className="f-banda">
+          <div className="f-costado">
+            {principal ? (
+              <img src={`/api/fotos/${principal.id}`} alt={`${b.modelo}, costado`} />
+            ) : (
+              <span className="f-sem-foto">Foto do costado</span>
+            )}
+          </div>
+          <div className="f-titulo-bloco">
+            <div>
+              <p className="f-hero-eyebrow">{[b.marca, rotuloCondicao[b.condicao], b.ano].filter(Boolean).join(" · ")}</p>
+              <h1 className="f-modelo">{b.modelo}</h1>
+              <div className="f-filete" />
+              {b.descricao && <p className="f-hero-lead">{b.descricao}</p>}
+            </div>
+            <dl className="f-partes">
+              <div>
+                <dt>Preparada para</dt>
+                <dd className="f-nome">{p.cliente.nome}</dd>
+                <dd className="f-dado">{[p.cliente.cidade, p.cliente.uf].filter(Boolean).join(" / ") || "\u00a0"}</dd>
+              </div>
+              <div>
+                <dt>Seu consultor</dt>
+                <dd className="f-nome">{p.vendedor.nome}</dd>
+                <dd className="f-dado">{p.vendedor.telefone ? telefone(p.vendedor.telefone) : p.vendedor.email}</dd>
+              </div>
+              <div>
+                <dt>Válida até</dt>
+                <dd className="f-nome">{data(p.validade)}</dd>
+              </div>
+              {p.prazoEntrega && (
+                <div>
+                  <dt>Entrega</dt>
+                  <dd className="f-dado f-dado-forte">{p.prazoEntrega}</dd>
+                </div>
+              )}
+            </dl>
           </div>
         </section>
 
         {detalhes.length > 0 && (
-          <section className="f-detalhes" style={{ gridTemplateColumns: `repeat(${detalhes.length}, 1fr)` }}>
+          <section className="f-detalhes">
             {detalhes.map((f, i) => (
-              <img key={f.id} src={`/api/fotos/${f.id}`} alt={`${b.modelo}, detalhe ${i + 1}`} />
+              <img
+                key={f.id}
+                src={`/api/fotos/${f.id}`}
+                alt={`${b.modelo}, detalhe ${i + 1}`}
+                style={{ width: `${f.larguraMm}mm`, height: `${alturaDetalhes}mm` }}
+              />
             ))}
           </section>
         )}
-
-        <section className="f-partes">
-          <div>
-            <p className="f-rotulo">Preparada para</p>
-            <p className="f-nome">{p.cliente.nome}</p>
-            <p className="f-dado">{[p.cliente.cidade, p.cliente.uf].filter(Boolean).join(" / ") || " "}</p>
-          </div>
-          <div>
-            <p className="f-rotulo">Seu consultor</p>
-            <p className="f-nome">{p.vendedor.nome}</p>
-            <p className="f-dado">{[p.vendedor.telefone && telefone(p.vendedor.telefone), p.vendedor.email].filter(Boolean).join(" · ")}</p>
-          </div>
-          <div>
-            <p className="f-rotulo">Válida até</p>
-            <p className="f-nome">{data(p.validade)}</p>
-            <p className="f-dado">{p.prazoEntrega ? `Entrega: ${p.prazoEntrega}` : " "}</p>
-          </div>
-        </section>
 
         <section className="f-corpo" data-ajuste>
           <div className="f-linha">

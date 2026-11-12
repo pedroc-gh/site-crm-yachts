@@ -4,6 +4,8 @@ import { db } from "@/lib/db";
 import { exigirUsuario } from "@/lib/auth";
 import { data, numeroProposta, reais } from "@/lib/formato";
 import { MAX_DETALHES } from "@/lib/rotulos";
+import { garantirDimensoes } from "@/lib/fotos";
+import { ehVertical, foraDoPadrao } from "@/lib/proporcao";
 import { TagCondicao, TagStatusEmbarcacao, TagStatusProposta } from "@/components/Tags";
 import { FormEmbarcacao } from "../FormEmbarcacao";
 import { excluirEmbarcacao, fotoPrincipal, removerFoto } from "../actions";
@@ -17,11 +19,12 @@ export default async function Embarcacao({
 }) {
   const u = await exigirUsuario();
   const { id } = await params;
+  await garantirDimensoes(id);
   const { salvo, erro } = await searchParams;
   const b = await db.embarcacao.findUnique({
     where: { id },
     include: {
-      fotos: { select: { id: true, papel: true }, orderBy: { ordem: "asc" } },
+      fotos: { select: { id: true, papel: true, largura: true, altura: true }, orderBy: { ordem: "asc" } },
       propostas: {
         where: u.papel === "ADMIN" ? {} : { vendedorId: u.id },
         include: { cliente: { select: { nome: true } } },
@@ -59,7 +62,10 @@ export default async function Embarcacao({
           <figure className="slot slot-principal">
             {principal ? <img src={`/api/fotos/${principal.id}`} alt={`${b.modelo}, costado`} /> : <span className="slot-vazio">Falta a foto do costado</span>}
             <figcaption>
-              <span>Principal · costado</span>
+              <span>
+                Principal · costado 4:3
+                {principal && (ehVertical(principal) || foraDoPadrao(principal)) && <em className="slot-alerta"> · fora do 4:3, será recortada</em>}
+              </span>
               {principal && (
                 <form action={removerFoto}><input type="hidden" name="fotoId" value={principal.id} /><button className="btn btn-texto btn-sm slot-acao perigo">Remover</button></form>
               )}
@@ -67,9 +73,17 @@ export default async function Embarcacao({
           </figure>
           {Array.from({ length: MAX_DETALHES }, (_, i) => detalhes[i]).map((f, i) => (
             <figure className="slot" key={f?.id ?? `vazio-${i}`}>
-              {f ? <img src={`/api/fotos/${f.id}`} alt={`${b.modelo}, detalhe ${i + 1}`} /> : <span className="slot-vazio">Detalhe {i + 1} · falta</span>}
+              {f ? (
+                <div className="slot-moldura"><img className={ehVertical(f) ? "vertical" : undefined} src={`/api/fotos/${f.id}`} alt={`${b.modelo}, detalhe ${i + 1}`} /></div>
+              ) : (
+                <span className="slot-vazio">Detalhe {i + 1} · falta</span>
+              )}
               <figcaption>
-                <span>Detalhe {i + 1}</span>
+                <span>
+                  Detalhe {i + 1}
+                  {f && ` · ${ehVertical(f) ? "vertical 3:4" : "horizontal 4:3"}`}
+                  {f && foraDoPadrao(f) && <em className="slot-alerta"> · fora do padrão, será recortada</em>}
+                </span>
                 {f && (
                   <span className="linha-flex" style={{ gap: 10 }}>
                     <form action={fotoPrincipal}><input type="hidden" name="fotoId" value={f.id} /><button className="btn btn-texto btn-sm slot-acao">Tornar principal</button></form>

@@ -5,6 +5,7 @@ import type { Condicao, StatusEmbarcacao } from "@prisma/client";
 import { db } from "@/lib/db";
 import { exigirUsuario } from "@/lib/auth";
 import { lerValor } from "@/lib/formato";
+import { lerDimensoes } from "@/lib/fotos";
 import { MAX_ITENS, MAX_DETALHES } from "@/lib/rotulos";
 
 const txt = (f: FormData, k: string) => {
@@ -52,14 +53,16 @@ async function salvarFotos(embarcacaoId: string, fotos: { principal?: File; deta
   if (fotos.principal) {
     // A nova foto principal substitui a anterior
     await db.foto.deleteMany({ where: { embarcacaoId, papel: "PRINCIPAL" } });
+    const dados = Buffer.from(await fotos.principal.arrayBuffer());
     await db.foto.create({
-      data: { embarcacaoId, papel: "PRINCIPAL", mime: fotos.principal.type, dados: Buffer.from(await fotos.principal.arrayBuffer()), ordem: 0 },
+      data: { embarcacaoId, papel: "PRINCIPAL", mime: fotos.principal.type, dados, ordem: 0, ...lerDimensoes(dados) },
     });
   }
   const ultima = await db.foto.aggregate({ where: { embarcacaoId }, _max: { ordem: true } });
   let ordem = (ultima._max.ordem ?? 0) + 1;
   for (const f of fotos.detalhes) {
-    await db.foto.create({ data: { embarcacaoId, papel: "DETALHE", mime: f.type, dados: Buffer.from(await f.arrayBuffer()), ordem: ordem++ } });
+    const dados = Buffer.from(await f.arrayBuffer());
+    await db.foto.create({ data: { embarcacaoId, papel: "DETALHE", mime: f.type, dados, ordem: ordem++, ...lerDimensoes(dados) } });
   }
 }
 

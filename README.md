@@ -94,14 +94,13 @@ Esqueceu a senha: **Nova senha provisória**. Saiu da empresa: **Transferir cart
 A proposta é **uma única folha A4** (210 × 297 mm), na ordem de leitura:
 
 1. Topo com logo, número e data
-2. Foto principal do costado, com o nome do modelo
-3. Três fotos de detalhe
-4. Cliente, consultor e validade
+2. Foto principal do costado em **4:3 horizontal**, ao lado do nome do modelo, do cliente, do consultor e da validade
+3. Três fotos de detalhe, cada uma em **4:3 horizontal ou 3:4 vertical** conforme a própria foto
 5. Ficha técnica e condições | investimento e **valor final** (em dourado)
 6. Itens e equipamentos (até 30, em 3 colunas)
 7. Rodapé com o contato do consultor
 
-Se o conteúdo for longo (muitos itens ou opcionais), o texto do corpo diminui sozinho, até 72%, para caber na folha. Se mesmo assim não couber, um aviso aparece acima da proposta. Também aparece um aviso quando faltam fotos da embarcação.
+Se o conteúdo for longo (muitos itens ou opcionais), o texto do corpo diminui sozinho, até 72%, para caber na folha. Se mesmo assim não couber, um aviso aparece acima da proposta. Também aparece um aviso quando faltam fotos da embarcação ou quando alguma foge do 4:3 / 3:4 (nesse caso ela é recortada para caber).
 
 Para baixar, use **Baixar PDF / imprimir** e escolha "Salvar como PDF".
 

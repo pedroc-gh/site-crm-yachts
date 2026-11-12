@@ -163,6 +163,8 @@ enum PapelFoto {
 model Foto {
   id           String     @id @default(cuid())
   papel        PapelFoto  @default(DETALHE)
+  largura      Int? // pixels; define se a foto é horizontal (4:3) ou vertical (3:4)
+  altura       Int?
   embarcacaoId String
   embarcacao   Embarcacao @relation(fields: [embarcacaoId], references: [id], onDelete: Cascade)
   mime         String

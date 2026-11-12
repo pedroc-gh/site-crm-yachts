@@ -157,7 +157,7 @@ export function FormEmbarcacao({
             <label htmlFor="fotoPrincipal">Foto principal: costado</label>
             <input id="fotoPrincipal" name="fotoPrincipal" type="file" accept="image/jpeg,image/png,image/webp" />
             <span className="ajuda">
-              O barco inteiro de lado, em foto horizontal. É a imagem grande da proposta.
+              O barco inteiro de lado, em foto horizontal 4:3 (ex.: 4000 × 3000 px). É a imagem grande da proposta.
               {fotosAtuais?.principal ? " Enviar outra substitui a atual." : ""}
             </span>
           </div>
@@ -174,7 +174,7 @@ export function FormEmbarcacao({
             <span className="ajuda">
               {(fotosAtuais?.detalhes ?? 0) >= MAX_DETALHES
                 ? "Já há 3 fotos de detalhe. Remova uma para enviar outra."
-                : "Cockpit, interior, painel, flybridge. Até 3 fotos."}
+                : "Cockpit, interior, painel, flybridge. Até 3 fotos em 4:3 horizontal ou 3:4 vertical."}
             </span>
           </div>
         </div>
